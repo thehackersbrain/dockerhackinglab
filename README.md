@@ -2,16 +2,10 @@
 
 ![Banner Image](https://raw.githubusercontent.com/thehackersbrain/kalivnc/refs/heads/main/screenshots/kalivnc.png)
 
-- On GCP Console (with custom configuration)
+- On GCP Console
 ```bash
 git clone https://github.com/thehackersbrain/dockerhackinglab.git && cd dockerhackinglab
-docker-compose up -d -f docker-compose.yaml
-```
-
-- On GCP Console (with custom configuration)
-```bash
-git clone https://github.com/thehackersbrain/dockerhackinglab.git && cd dockerhackinglab
-docker-compose up -d -f docker-compose-web.yaml
+docker-compose up -d
 ```
 
 - For stopping the lab
