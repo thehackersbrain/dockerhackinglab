@@ -1,0 +1,61 @@
+version: '3.7'
+
+services:
+  kali-desktop:
+    build:
+      context: .
+      dockerfile: Dockerfile.kali-desktop
+    container_name: kali-desktop
+    labels:
+      org.cybercraftlabs.project: "Docker Hacking Lab"
+      org.cybercraftlabs.version: "1.0"
+      org.cybercraftlabs.description: "Kali Linux with XFCE Desktop"
+    network_mode: host
+    volumes:
+      - kali-home:/root
+    restart: unless-stopped
+
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: dvwa
+    labels:
+      org.cybercraftlabs.project: "Docker Hacking Lab"
+      org.cybercraftlabs.version: "1.0"
+      org.cybercraftlabs.description: "Damn Vulnerable Web Application"
+    networks:
+      security_network:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "8888:8888"
+    restart: always
+
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    container_name: juice-shop
+    labels:
+      org.cybercraftlabs.project: "Docker Hacking Lab"
+      org.cybercraftlabs.version: "1.0"
+      org.cybercraftlabs.description: "OWASP Juice Shop"
+    networks:
+      security_network:
+        ipv4_address: 172.18.0.3
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  security_network:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
+
+volumes:
+  kali-home:
+    driver: local

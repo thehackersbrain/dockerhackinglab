@@ -1,0 +1,31 @@
+FROM kalilinux/kali-rolling
+
+LABEL maintainer="Gaurav Raj <gauravraj@cybercraftlabs.org>"
+LABEL version="1.0"
+LABEL description="Kali Linux with XFCE Desktop and VNC"
+LABEL org.opencontainers.image.title="Kali Desktop"
+LABEL org.opencontainers.image.authors="Gaurav Raj <contact@thehackersbrain.online>"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.source="https://github.com/thehackersbrain/kalivnc"
+
+RUN apt update && \
+	DEBIAN_FRONTEND=noninteractive apt install -y kali-desktop-xfce kali-linux-default locales sudo
+RUN apt update && \
+	DEBIAN_FRONTEND=noninteractive apt install -y xrdp tigervnc-standalone-server && \
+	echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+	dpkg-reconfigure --frontend=noninteractive locales && \
+	update-locale LANG=en_US.UTF-8
+RUN apt install iputils-ping git golang -y
+RUN apt clean -y && apt autoremove -y
+
+RUN apt install novnc x11vnc -y
+RUN touch /root/.Xauthority
+COPY ./config/vimrc /root/.vimrc
+COPY ./config/tmux.conf /root/.tmux.conf
+RUN mkdir -p /root/.vnc
+RUN mkdir -p /root/.config/tigervnc
+COPY ./config/passwd /root/.vnc/passwd
+RUN chmod 600 /root/.vnc/passwd
+RUN cp -r /root/.vnc/* /root/.config/tigervnc/
+
+CMD ["sh", "-c", "vncserver :1 -geometry 1280x1024 -depth 24 -localhost no -xstartup /usr/bin/startxfce4 && tail -f /dev/null"]
