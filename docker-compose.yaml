@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  kali-linux:
+    image: lscr.io/linuxserver/kali-linux:latest
+    container_name: kali-linux
+    networks:
+      security_network:
+        ipv4_address: 172.18.0.4
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SUBFOLDER=/ #optional
+      - "TITLE=Kali Linux" #optional
+    volumes:
+      - /path/to/data:/config
+      - /var/run/docker.sock:/var/run/docker.sock #optional
+    ports:
+      - 3004:3000
+      - 3005:3001
+    shm_size: "1gb" #optional
+    restart: unless-stopped
+  
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: dvwa
+    networks:
+      security_network:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "8888:8888"
+
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    container_name: juice-shop
+    networks:
+      security_network:
+        ipv4_address: 172.18.0.3
+    ports:
+      - "3000:3000"
+
+networks:
+  security_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
